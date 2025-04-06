@@ -1,13 +1,14 @@
 import pandas as pd
 import numpy as np
 from fetch_data import BinancePriceData
+import price_bucket
 import os
 from pandas.tseries.holiday import USFederalHolidayCalendar
 
 
 def volatility_hourly_intraday_include_holiday(binance_price_freq, binance_price_id):
     # 設定輸出資料夾
-    output_folder = r"D:\下載\Zone wallet\zonewallet-quant-research\projects\cex_savings_product\hourly_avg_volatility"
+    output_folder = r"D:\下載\Volatility_Research\processed\hourly_avg_volatility"
     os.makedirs(output_folder, exist_ok=True)
 
     # 用來存放所有時間週期的資料
@@ -15,7 +16,7 @@ def volatility_hourly_intraday_include_holiday(binance_price_freq, binance_price
 
     for freq in binance_price_freq:
         # 設定輸入檔案路徑
-        input_file = rf"D:\下載\Zone wallet\zonewallet-quant-research\projects\cex_savings_product\price_data\{binance_price_id}_{freq}_Binance_price_data.csv"
+        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_Binance_price_data.csv"
 
         # 讀取 CSV 檔案
         df = pd.read_csv(input_file)
@@ -51,7 +52,9 @@ def volatility_hourly_intraday_include_holiday(binance_price_freq, binance_price
 
 
 def volatility_hourly_intraday_exclude_holiday(binance_price_freq, binance_price_id):
-    output_folder = r"D:\下載\Zone wallet\zonewallet-quant-research\projects\cex_savings_product\hourly_avg_volatility_exclude_holiday"
+    output_folder = (
+        r"D:\下載\Volatility_Research\processed\hourly_avg_volatility_exclude_holiday"
+    )
     os.makedirs(output_folder, exist_ok=True)
 
     cal = USFederalHolidayCalendar()
@@ -61,7 +64,7 @@ def volatility_hourly_intraday_exclude_holiday(binance_price_freq, binance_price
     all_hourly_vol_list = []
 
     for freq in binance_price_freq:
-        input_file = rf"D:\下載\Zone wallet\zonewallet-quant-research\projects\cex_savings_product\price_data\{binance_price_id}_{freq}_Binance_price_data.csv"
+        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_Binance_price_data.csv"
         df = pd.read_csv(input_file)
 
         if "datetime" in df.columns and "high" in df.columns and "low" in df.columns:
@@ -95,7 +98,9 @@ def volatility_hourly_intraday_exclude_holiday(binance_price_freq, binance_price
 
 
 def volatility_hourly_intraday_only_holiday(binance_price_freq, binance_price_id):
-    output_folder = r"D:\下載\Zone wallet\zonewallet-quant-research\projects\cex_savings_product\hourly_avg_volatility_only_holiday"
+    output_folder = (
+        r"D:\下載\Volatility_Research\processed\hourly_avg_volatility_only_holiday"
+    )
     os.makedirs(output_folder, exist_ok=True)
 
     cal = USFederalHolidayCalendar()
@@ -104,7 +109,7 @@ def volatility_hourly_intraday_only_holiday(binance_price_freq, binance_price_id
     all_holiday_hourly_vol = []
 
     for freq in binance_price_freq:
-        input_file = rf"D:\下載\Zone wallet\zonewallet-quant-research\projects\cex_savings_product\price_data\{binance_price_id}_{freq}_Binance_price_data.csv"
+        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_Binance_price_data.csv"
         df = pd.read_csv(input_file)
 
         if "datetime" in df.columns and "high" in df.columns and "low" in df.columns:
@@ -140,20 +145,22 @@ def volatility_hourly_intraday_only_holiday(binance_price_freq, binance_price_id
 def volatility_hourly_by_price_level_include_holiday(
     binance_price_freq, binance_price_id
 ):
-    output_folder = r"D:\下載\Zone wallet\zonewallet-quant-research\projects\cex_savings_product\hourly_avg_volatility_by_price_level"
+    output_folder = (
+        r"D:\下載\Volatility_Research\processed\hourly_avg_volatility_by_price_level"
+    )
     os.makedirs(output_folder, exist_ok=True)
 
     all_hourly_avg_list = []
 
     for freq in binance_price_freq:
-        input_file = rf"D:\下載\Zone wallet\zonewallet-quant-research\projects\cex_savings_product\price_data\{binance_price_id}_{freq}_Binance_price_data.csv"
+        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_Binance_price_data.csv"
         df = pd.read_csv(input_file)
 
         if {"datetime", "high", "low", "close"}.issubset(df.columns):
             df["vol"] = df["high"] - df["low"]
             df["datetime"] = pd.to_datetime(df["datetime"])
             df["hour"] = df["datetime"].dt.hour
-            df["price_level"] = df["close"].apply(get_price_bucket)
+            df["price_level"] = df["close"].apply(price_bucket.get_price_bucket)
 
             # 移除無效價格分類
             df = df[df["price_level"] != "invalid"]

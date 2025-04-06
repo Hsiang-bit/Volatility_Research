@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from fetch_data import BinancePriceData
 import os
 
 
@@ -13,7 +12,7 @@ def price_correlation(
     end_time,
     data_dir,
     export_csv=True,
-    output_dir="correlation_reports",
+    output_dir="D:\下載\Volatility_Research\processed\correlation_reports",
 ):
     """
     計算兩個 Token 在多個 timeframe 下的報酬率 (ret) 相關係數
@@ -92,7 +91,7 @@ def volatility_correlation(
     end_time,
     data_dir,
     export_csv=True,
-    output_dir="correlation_reports",
+    output_dir="D:\下載\Volatility_Research\processed\correlation_reports",
 ):
     """
     計算兩個 Token 在多個 timeframe 下的波動度相關係數

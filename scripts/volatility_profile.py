@@ -3,7 +3,7 @@ import numpy as np
 from fetch_data import BinancePriceData
 import os
 from pandas.tseries.holiday import USFederalHolidayCalendar
-from utils import price_bucket
+import price_bucket
 
 
 # Volatility Profile
