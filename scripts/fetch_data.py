@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import os
 from pandas.tseries.holiday import USFederalHolidayCalendar
-from TradingviewData import TradingViewData, Interval
 
 
 class BinancePriceData:
@@ -148,7 +147,3 @@ def fetch_data(binance_price_freq, binance_price_id, start_time, end_time, price
         binance_price = BinancePriceData(
             binance_price_id, freq, start_time, end_time, price_url
         ).get_data()
-
-
-class TradingViewData:
-    request = TradingViewData()

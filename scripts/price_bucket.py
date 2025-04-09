@@ -7,4 +7,4 @@ def get_price_bucket(price):
     if price == 0 or pd.isna(price):
         return "invalid"
     price_str = str(int(price))
-    return f"{len(price_str)}figures-{price_str[0]}"
+    return f"{len(price_str)}f-{price_str[0]}"
