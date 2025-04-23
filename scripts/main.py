@@ -6,10 +6,13 @@ import os
 
 start_time = "2024-04-01 00:00:00"
 end_time = "2025-03-31 23:59:59"
-binance_price_id = "BNBUSDT"
+binance_price_id = "AVAXUSDT"
 binance_price_freq = ["1w", "1d", "4h", "1h", "30m", "15m", "5m", "1m"]
 price_url = r"D:\下載\Volatility_Research\data\raw"
 
+fetch_data.fetch_data(
+    binance_price_freq, binance_price_id, start_time, end_time, price_url
+)
 
 # volatility_profile.volatility_profile_compare_and_only_holiday(
 #     binance_price_freq, binance_price_id
@@ -19,7 +22,7 @@ price_url = r"D:\下載\Volatility_Research\data\raw"
 #     binance_price_freq, binance_price_id
 # )
 
-hourly_volatility.volatility_hourly_intraday(binance_price_freq, binance_price_id)
+# hourly_volatility.volatility_hourly_intraday(binance_price_freq, binance_price_id)
 
 # hourly_volatility.volatility_hourly_intraday_include_holiday(
 #     binance_price_freq, binance_price_id
@@ -55,6 +58,6 @@ hourly_volatility.volatility_hourly_intraday(binance_price_freq, binance_price_i
 #     data_dir=price_url,
 # )
 
-# day_in_week_volatility.volatility_hourly_intraday_by_weekday(
-#     binance_price_freq, binance_price_id
-# )
+day_in_week_volatility.volatility_hourly_intraday_by_weekday(
+    binance_price_freq, binance_price_id
+)
