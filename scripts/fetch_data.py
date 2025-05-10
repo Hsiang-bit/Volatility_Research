@@ -216,11 +216,12 @@ class BinancePriceData:
 
 
 # Data Download
-def fetch_data(binance_price_freq, binance_price_id, start_time, end_time, price_url):
-    for freq in binance_price_freq:
-        binance_price = BinancePriceData(
-            binance_price_id, freq, start_time, end_time, price_url
-        ).get_data()
+def fetch_data(binance_price_freq, binance_price_ids, start_time, end_time, price_url):
+    for id in binance_price_ids:
+        for freq in binance_price_freq:
+            binance_price = BinancePriceData(
+                id, freq, start_time, end_time, price_url
+            ).get_data()
 
 
 # index data is ganna use tradingview data by hand

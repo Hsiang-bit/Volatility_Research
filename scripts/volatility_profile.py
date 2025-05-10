@@ -6,6 +6,7 @@ from pandas.tseries.holiday import USFederalHolidayCalendar
 import price_bucket
 import matplotlib.pyplot as plt
 import seaborn as sns
+import holidays
 
 
 # Volatility Profile
@@ -61,6 +62,87 @@ def volatility_profile_by_close_price_magnitude(binance_price_freq, binance_pric
         print(f"✅ 已儲存: {output_file}")
     else:
         print("⚠️ 無可用資料，未產生統計結果")
+
+
+def volatility_profile_multi_assets(
+    binance_price_freq, binance_price_ids, start_time=None, end_time=None
+):
+    output_folder = r"D:\下載\Volatility_Research\processed\statistics_data_compare"
+    os.makedirs(output_folder, exist_ok=True)
+
+    cal = USFederalHolidayCalendar()
+    holiday_range = cal.holidays(start="2020-01-01", end="2030-12-31")
+
+    mean_data = {"include_holiday": {}, "exclude_holiday": {}, "only_holiday": {}}
+    median_data = {"include_holiday": {}, "exclude_holiday": {}, "only_holiday": {}}
+
+    for binance_price_id in binance_price_ids:
+        for freq in binance_price_freq:
+            input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_Binance_price_data.csv"
+            try:
+                df = pd.read_csv(input_file)
+
+                if {"datetime", "high", "low"}.issubset(df.columns):
+                    df["datetime"] = pd.to_datetime(df["datetime"])
+                    df["vol"] = df["high"] - df["low"]
+
+                    # 含假日
+                    mean_data["include_holiday"].setdefault(binance_price_id, {})[
+                        freq
+                    ] = round(df["vol"].mean(), 3)
+                    median_data["include_holiday"].setdefault(binance_price_id, {})[
+                        freq
+                    ] = round(df["vol"].median(), 3)
+
+                    # 篩選時間範圍
+                    if start_time:
+                        df = df[df["datetime"] >= pd.to_datetime(start_time)]
+                    if end_time:
+                        df = df[df["datetime"] <= pd.to_datetime(end_time)]
+
+                    # 排除週末與美國假日
+                    df_filtered = df[
+                        (df["datetime"].dt.weekday < 5)
+                        & (~df["datetime"].dt.normalize().isin(holiday_range))
+                    ]
+                    if not df_filtered.empty:
+                        mean_data["exclude_holiday"].setdefault(binance_price_id, {})[
+                            freq
+                        ] = round(df["vol"].mean(), 3)
+                        median_data["exclude_holiday"].setdefault(binance_price_id, {})[
+                            freq
+                        ] = round(df["vol"].median(), 3)
+
+                    # 僅保留假日與週末
+                    df_only_holidays = df[
+                        (df["datetime"].dt.weekday >= 5)
+                        | (df["datetime"].dt.normalize().isin(holiday_range))
+                    ]
+                    if not df_only_holidays.empty:
+                        mean_data["only_holiday"].setdefault(binance_price_id, {})[
+                            freq
+                        ] = df_only_holidays["vol"].mean()
+                        median_data["only_holiday"].setdefault(binance_price_id, {})[
+                            freq
+                        ] = df_only_holidays["vol"].median()
+                else:
+                    print(f"❌ {input_file} 缺少必要欄位")
+            except Exception as e:
+                print(f"❌ 處理 {input_file} 時出錯: {e}")
+
+    def build_df(data_dict):
+        df = pd.DataFrame(data_dict).T
+        df = df[binance_price_freq]  # 按照順序排序
+        return df
+
+    for key in ["include_holiday", "exclude_holiday", "only_holiday"]:
+        mean_df = build_df(mean_data[key])
+        median_df = build_df(median_data[key])
+
+        combined_df = pd.concat([mean_df, median_df], axis=0, keys=["mean", "median"])
+        output_file = os.path.join(output_folder, f"volatility_stats_{key}.csv")
+        combined_df.to_csv(output_file)
+        print(f"✅ 已輸出: {output_file}")
 
 
 def volatility_profile_compare_and_only_holiday(binance_price_freq, binance_price_id):
