@@ -16,7 +16,7 @@ def volatility_hourly_intraday_by_weekday(binance_price_freq, binance_price_id):
 
     for freq in binance_price_freq:
         # 設定輸入檔案路徑
-        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_Binance_price_data.csv"
+        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_price_data.csv"
 
         try:
             df = pd.read_csv(input_file)

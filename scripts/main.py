@@ -8,11 +8,27 @@ start_time = "2025-05-01 00:00:00"
 end_time = "2025-05-09 23:59:59"
 binance_price_id = "ETHUSDT"
 binance_price_ids = ["ETHUSDT", "ETCUSDT", "BTCUSDT", "BCHUSDT", "SOLUSDT"]
+price_ids = ["ES=F", "NQ=F", "YM=F", "RTY=F"]
+ids = [
+    "ETHUSDT",
+    "ETCUSDT",
+    "BTCUSDT",
+    "BCHUSDT",
+    "SOLUSDT",
+    "ES=F",
+    "NQ=F",
+    "YM=F",
+    "RTY=F",
+]
 binance_price_freq = ["1d", "4h", "1h", "30m", "15m", "5m", "1m"]
 price_url = r"D:\下載\Volatility_Research\data\raw"
 
-fetch_data.fetch_data(
+fetch_data.fetch_data.crypto(
     binance_price_freq, binance_price_ids, start_time, end_time, price_url
+)
+
+fetch_data.fetch_data.index(
+    binance_price_freq, price_ids, start_time, end_time, price_url
 )
 
 # volatility_profile.volatility_profile_compare_and_only_holiday(
@@ -20,7 +36,7 @@ fetch_data.fetch_data(
 # )
 
 volatility_profile.volatility_profile_multi_assets(
-    binance_price_freq, binance_price_ids, start_time, end_time
+    binance_price_freq, ids, start_time, end_time
 )
 
 # volatility_profile.volatility_profile_by_close_price_magnitude(

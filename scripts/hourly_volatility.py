@@ -21,7 +21,7 @@ def volatility_hourly_intraday(binance_price_freq, binance_price_id):
 
     for freq in binance_price_freq:
         # 設定輸入檔案路徑
-        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_Binance_price_data.csv"
+        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_price_data.csv"
         df = pd.read_csv(input_file)
 
         # 確保必要欄位存在
@@ -87,7 +87,7 @@ def volatility_hourly_by_price_level_include_holiday(
     all_hourly_avg_list = []
 
     for freq in binance_price_freq:
-        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_Binance_price_data.csv"
+        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_price_data.csv"
         df = pd.read_csv(input_file)
 
         if {"datetime", "high", "low", "close"}.issubset(df.columns):

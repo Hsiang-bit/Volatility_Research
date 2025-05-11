@@ -5,6 +5,7 @@ from pandas.tseries.holiday import USFederalHolidayCalendar
 from binance.spot import Spot as Client
 from binance.lib.utils import config_logging
 from datetime import datetime, timedelta
+import yfinance as yf
 
 
 class TimeFrameConvert:
@@ -112,7 +113,7 @@ class BinancePriceData:
         self.local_folder = local_folder
         os.makedirs(self.local_folder, exist_ok=True)  # 自動建立資料夾（如果不存在）
         self.local_file = os.path.join(
-            self.local_folder, f"{self.symbol}_{self.freq}_Binance_price_data.csv"
+            self.local_folder, f"{self.symbol}_{self.freq}_price_data.csv"
         )
 
     def get_klines(self, freq, start_date, end_date):
@@ -216,12 +217,84 @@ class BinancePriceData:
 
 
 # Data Download
-def fetch_data(binance_price_freq, binance_price_ids, start_time, end_time, price_url):
-    for id in binance_price_ids:
-        for freq in binance_price_freq:
-            binance_price = BinancePriceData(
-                id, freq, start_time, end_time, price_url
-            ).get_data()
+class fetch_data:
+    def crypto(binance_price_freq, binance_price_ids, start_time, end_time, price_url):
+        for id in binance_price_ids:
+            for freq in binance_price_freq:
+                binance_price = BinancePriceData(
+                    id, freq, start_time, end_time, price_url
+                ).get_data()
+
+    def index(price_freq, price_ids, start_time, end_time, price_path):
+        output_dir = price_path
+        os.makedirs(output_dir, exist_ok=True)
+
+        # 移除時間，只保留日期
+        start_time = start_time.split(" ")[0]
+        end_time = end_time.split(" ")[0]
+
+        for symbol in price_ids:
+            for freq in price_freq:
+                filename = os.path.join(output_dir, f"{symbol}_{freq}_price_data.csv")
+                existing_df = pd.DataFrame()
+
+                # 檢查舊資料
+                if os.path.exists(filename):
+                    existing_df = pd.read_csv(filename, parse_dates=["datetime"])
+                    last_dt = existing_df["datetime"].max().date().isoformat()
+                    download_start = (
+                        (pd.to_datetime(last_dt) + pd.Timedelta(days=1))
+                        .date()
+                        .isoformat()
+                    )
+                else:
+                    download_start = start_time
+
+                if download_start > end_time:
+                    print(f"✅ {symbol} - {freq} 資料已最新，無需下載")
+                    continue
+
+                try:
+                    new_df = yf.download(
+                        symbol, start=download_start, end=end_time, interval=freq
+                    )
+
+                    if not new_df.empty:
+                        new_df = new_df.reset_index()  # 把 datetime 拉回欄位
+                        datetime_col = (
+                            "Datetime" if "Datetime" in new_df.columns else "Date"
+                        )
+                        new_df[datetime_col] = pd.to_datetime(
+                            new_df[datetime_col]
+                        ).dt.tz_localize(None)
+                        new_df = new_df[
+                            [datetime_col, "Open", "High", "Low", "Close", "Volume"]
+                        ]
+                        new_df.columns = [
+                            "datetime",
+                            "open",
+                            "high",
+                            "low",
+                            "close",
+                            "volume",
+                        ]
+
+                        if not existing_df.empty:
+                            combined_df = pd.concat([existing_df, new_df])
+                            combined_df = combined_df.drop_duplicates(
+                                subset="datetime", keep="last"
+                            )
+                            combined_df.sort_values("datetime", inplace=True)
+                        else:
+                            combined_df = new_df
+
+                        combined_df.to_csv(filename, index=False)
+                        print(f"✅ {symbol} - {freq} 已更新資料至 {filename}")
+                    else:
+                        print(f"⚠️ {symbol} - {freq} 無新資料")
+
+                except Exception as e:
+                    print(f"❌ {symbol} - {freq} 更新失敗：{e}")
 
 
 # index data is ganna use tradingview data by hand

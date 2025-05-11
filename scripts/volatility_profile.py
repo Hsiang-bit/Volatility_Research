@@ -17,7 +17,7 @@ def volatility_profile_by_close_price_magnitude(binance_price_freq, binance_pric
     all_stats_list = []
 
     for freq in binance_price_freq:
-        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_Binance_price_data.csv"
+        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_price_data.csv"
 
         try:
             df = pd.read_csv(input_file)
@@ -78,7 +78,7 @@ def volatility_profile_multi_assets(
 
     for binance_price_id in binance_price_ids:
         for freq in binance_price_freq:
-            input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_Binance_price_data.csv"
+            input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_price_data.csv"
             try:
                 df = pd.read_csv(input_file)
 
@@ -155,7 +155,7 @@ def volatility_profile_compare_and_only_holiday(binance_price_freq, binance_pric
     combined_stats = []
 
     for freq in binance_price_freq:
-        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_Binance_price_data.csv"
+        input_file = rf"D:\下載\Volatility_Research\data\raw\{binance_price_id}_{freq}_price_data.csv"
 
         try:
             df = pd.read_csv(input_file)

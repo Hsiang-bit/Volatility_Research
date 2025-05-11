@@ -15,7 +15,7 @@ def plot_multiscale_intraday_volatility(binance_price_id):
 
     for i, freq in enumerate(freq_list):
         file_path = os.path.join(
-            input_folder, f"{binance_price_id}_{freq}_Binance_price_data.csv"
+            input_folder, f"{binance_price_id}_{freq}_price_data.csv"
         )
         if not os.path.exists(file_path):
             print(f"❌ File not found: {file_path}")
